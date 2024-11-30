@@ -1,0 +1,35 @@
+GET http://localhost:3000/employees/ 
+
+### 
+
+POST http://localhost:3000/employee/ 
+Content-Type: application/json 
+
+ {
+    "name": "Jane Roberts",
+    "email": "jane.roberts@example.com",
+    "position": "QA Engineer",
+    "department": "Quality Assurance",
+    "salary": 72000
+  } 
+
+### 
+
+GET http://localhost:3000/employee/10 
+
+### 
+
+PUT http://localhost:3000/employee/10 
+Content-Type: application/json 
+
+{
+    "name": "Jane Roberts",
+    "email": "jane.roberts@example.com",
+    "position": "QA Engineer",
+    "department": "Quality Assurance",
+    "salary": 80000
+  }  
+
+### 
+
+DELETE http://localhost:3000/employee/10
