@@ -2,6 +2,7 @@ const express = require("express")
 const {open} = require("sqlite")
 const sqlite3 = require("sqlite3")
 const path = require("path")
+const bcrypt = require("bcrypt")
 const app = express() 
 const dbPath = path.join(__dirname, "Employee-System.db") 
 let db = null 
@@ -28,6 +29,32 @@ initializeDBAndServer()
 
 // APIs For All Of The Employee Management System (CURD) Operations 
 
+app.post("/users", async(request,response) => {
+    const {username, email,password} = request.body 
+    const hasedPassword = await bcrypt.hash(request.body.password, 10)
+    const selectUserQuery = `SELECT * FROM users WHERE username = '${username}';`;
+    const dbUser = await db.get(selectUserQuery) 
+    if (dbUser === undefined){
+        const createUserQuery = `
+        INSERT INTO 
+        users (username, email, password)
+        VALUES 
+        (
+        "${username}",
+        "${email}",
+        "${hasedPassword}"
+        );
+        `; 
+        const dbResponse = await db.run(createUserQuery)
+        response.send("Created New User")
+    } else{
+        response.status(400)
+        response.send("User Already Existed")
+    }
+})
+
+// GET API 
+
 app.get("/employees/", async(request,response) => {
     const getEmployeeQuery = `
     SELECT 
@@ -39,6 +66,8 @@ app.get("/employees/", async(request,response) => {
     const employeeArray = await db.all(getEmployeeQuery)
     response.send(employeeArray)
 }); 
+
+// POST API
 
 app.post("/employee/", async(request,response) => {
     const employeeDetails = request.body 
@@ -58,6 +87,8 @@ app.post("/employee/", async(request,response) => {
     response.send("Employee Details Uploaded Successfully")
 }); 
 
+// GET API for specific employee
+
 app.get("/employee/:id", async (request,response) => {
     const {id} = request.params 
     const getEmployeeQuery = `
@@ -70,6 +101,8 @@ app.get("/employee/:id", async (request,response) => {
     const employeeDetails = await db.get(getEmployeeQuery)
     response.send(employeeDetails)
 });  
+
+// PUT API
 
 app.put("/employee/:id", async(request,response) => {
     const {id} = request.params 
@@ -89,6 +122,8 @@ app.put("/employee/:id", async(request,response) => {
     await db.run(updateEmployeeDetails)
     response.send("Employee Details Updated Successfully")
 }); 
+
+// DELETE API 
 
 app.delete("/employee/:id", async(request,response) => {
     const {id} = request.params 
